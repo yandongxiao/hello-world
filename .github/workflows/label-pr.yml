@@ -18,7 +18,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Label PR based on commit messages
+      - name: Label PR based on commit title
         uses: actions/github-script@v6
         with:
           # github-token: ${{ secrets.PAT }}
@@ -28,7 +28,7 @@ jobs:
 
             const labels = new Set();
             for (const { commit } of commits) {
-              const message = commit.message.toLowerCase();
+              const message = commit.title.toLowerCase();
               if (message.includes('feature')) {
                 labels.add('feature');
               }
