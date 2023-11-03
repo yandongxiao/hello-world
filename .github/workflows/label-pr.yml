@@ -21,7 +21,7 @@ jobs:
       - name: Label PR based on commit message
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PAT }}
           script: |
             const { owner, repo, number: pull_number } = context.issue;
             const { data: commits } = await github.rest.pulls.listCommits({ owner, repo, pull_number });
