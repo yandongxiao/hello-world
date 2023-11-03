@@ -11,23 +11,26 @@ permissions:
 
 jobs:
   labeler:
+    permissions:
+      contents: read # for TimonVS/pr-labeler-action to read config file
+      pull-requests: write # for TimonVS/pr-labeler-action to add labels in PR
     runs-on: ubuntu-latest
-    permissions: write-all
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Label PR based on commit message
-        uses: actions/github-script@v6
+      - name: Label PR based on commit messages
+        uses: actions/github-script@v5
         with:
           script: |
+            const { owner, repo, number: pull_number } = context.issue;
             const { data: commits } = await github.rest.pulls.listCommits({ owner, repo, pull_number });
+
             const labels = new Set();
             for (const { commit } of commits) {
               const message = commit.message.toLowerCase();
-              console.log(message);
               if (message.includes('feature')) {
                 labels.add('feature');
               }
@@ -46,10 +49,5 @@ jobs:
             }
 
             if (labels.size > 0) {
-              await github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                labels: Array.from(labels)
-              });
+              await github.rest.issues.addLabels({ owner, repo, issue_number: pull_number, labels: Array.from(labels) });
             }
